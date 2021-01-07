@@ -52,8 +52,6 @@ impl<'a> TimelineTrait<'a, InstantType, ValueType, Row<'a, Message>, Message, Ba
         time_event: &TimeEvent<InstantType, ValueType>,
         offset: InstantType,
     ) -> Row<'a, Message> {
-        // println!("SpaceLength: {}", ((time_event.instant - offset) as u16));
-        // println!("TextLength: {}", ((time_event.duration) as u16));
         widget
             .push(Space::with_width(Length::FillPortion(
                 (time_event.instant - offset) as u16,
@@ -79,7 +77,6 @@ pub fn main() -> iced::Result {
 
 struct State {
     slider: slider::State,
-    zoom: u8,
     time: InstantType,
     timeline: MyTimeline,
 }
@@ -122,7 +119,6 @@ impl iced::Sandbox for Model {
                         .collect(),
                 },
                 slider: slider::State::new(),
-                zoom: 100,
                 time: CURRTIME,
             },
         }
@@ -150,8 +146,7 @@ impl iced::Sandbox for Model {
             (e - CURRTIME) as u32..=(l - CURRTIME) as u32,
             (self.state.time - CURRTIME) as u32,
             Message::SliderChanged,
-        )
-        .step((l - e) / 1000 / self.state.zoom as u32);
+        );
 
         let _timeline = self.state.timeline.view();
 
