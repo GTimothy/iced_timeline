@@ -37,10 +37,10 @@ cargo run --example text_widget_timeline
 ![](./example.webp)
 
  ## To do / Contributing :
- * figuring out how to use a Canvas as the 'Timeline display area' and what
+ [] figuring out how to use a Canvas as the 'Timeline display area' and what
  changes to make to the [widget_add](/src/lib.rs#L58) function signature and
  calls to permit proper drawing.
- * can the set of necessary traits be even smaller, notably the Copy trait for
+ [] can the set of necessary traits be even smaller, notably the Copy trait for
  the Values?
- * improve the performance hit for very large numbers (>>10_000) due to
+ [x] improve the performance hit for very large numbers (>>10_000) due to
  iterating and filtering the entire timeline in an log(n) lines [56 and 57](https://github.com/GTimothy/iced_timeline/blob/660a072ea994839839a6ea63bb80422064388408/src/lib.rs#L66)

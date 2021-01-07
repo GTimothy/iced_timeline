@@ -19,7 +19,7 @@ pub struct TimelineWindow<I> {
 
 pub trait TimelineTrait<'w, I, V, W, Message, B>
 where
-    I: Copy + PartialOrd + Add<Output = I> + Sub<Output = I>,
+    I: Copy + Ord + Add<Output = I> + Sub<Output = I>,
     V: Copy,
     W: 'w + Widget<Message, Renderer<B>>,
     B: Backend,
@@ -61,14 +61,42 @@ where
         let widget: W = self.init_widget();
 
         let (window_start, window_end) = (self.window().start, self.window().end);
-        let (space_start, mut time_event) = self
-            .time_events()
-            .iter()
-            .filter(|t_e| t_e.instant > window_start && window_end > (t_e.instant + t_e.duration))
-            .fold((window_start, widget), |(ss, w), t_e| {
-                ({ t_e.instant + t_e.duration }, Self::widget_add(w, t_e, ss))
-            });
-        time_event = Self::widget_after(time_event, window_end - space_start);
-        time_event
+
+        let mut time_events = &self.time_events()[..];
+        // assuming the list is increasingly sorted, this gives the index of first event for which
+        //the instant is equal to the window **start**, or, if such event doesn't exist, the index
+        // where it would exist.
+        let start = match time_events.binary_search_by(|t_e| t_e.instant.cmp(&window_start)) {
+            Err(s) => s,
+            Ok(s) => s,
+        };
+        // if window is right of all data, dont bother with filling the widget
+        if start == time_events.len() {
+            widget
+        } else {
+            //forget about all the events before the window starts.
+            time_events = &time_events[start..];
+
+            // assuming the list is increasingly sorted, this gives the index of first event for
+            // which the instant is equal to the window **end**, or, if such event doesn't exist,
+            // the index where it would exist.
+            let end = match time_events.binary_search_by(|t_e| {
+                let t = t_e.instant + t_e.duration;
+                t.cmp(&window_end)
+            }) {
+                Ok(e) => e + 1,
+                Err(e) => e,
+            };
+
+            // Now, we can very efficiently work with the only events that should be displayed
+            time_events = &time_events[..end];
+            let (space_start, mut time_event) = time_events
+                .iter()
+                .fold((window_start, widget), |(ss, w), t_e| {
+                    ({ t_e.instant + t_e.duration }, Self::widget_add(w, t_e, ss))
+                });
+            time_event = Self::widget_after(time_event, window_end - space_start);
+            time_event
+        }
     }
 }
