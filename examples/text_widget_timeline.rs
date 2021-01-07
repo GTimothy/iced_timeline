@@ -142,8 +142,8 @@ impl iced::Sandbox for Model {
 
     fn view(&mut self) -> Element<Message> {
         let column = Column::new();
-        let e = self.state.timeline.earliest_instant(); // causes slowing when many TimeEvents
-        let l = self.state.timeline.latest_instant(); // causes slowing when many TimeEvents
+        let e = self.state.timeline.earliest_instant();
+        let l = self.state.timeline.latest_instant();
 
         let slider = Slider::new(
             &mut (self.state.slider),
