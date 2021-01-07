@@ -34,6 +34,8 @@ function: [init_widget](/src/lib.rs#L53).
 cargo run --example text_widget_timeline
 ```
 
+![](./example.webp)
+
  ## To do / Contributing :
  * figuring out how to use a Canvas as the 'Timeline display area' and what
  changes to make to the [widget_add](/src/lib.rs#L58) function signature and
